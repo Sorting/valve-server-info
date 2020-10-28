@@ -5,13 +5,8 @@ use std::time::Duration;
 use std::net::UdpSocket;
 use std::convert::{TryInto};
 
-pub enum ServerResponse<T> {
-    SuccessResponse(T),
-    Failure(String),
-}
-
-pub enum Response {
-    Ok(ByteReader),
+pub enum Response<T> {
+    Ok(T),
     Failure(String),
 }
 
@@ -109,7 +104,7 @@ impl Server {
         }
     }
 
-    pub fn send(&mut self, request: &[u8]) -> Response {
+    pub fn send(&mut self, request: &[u8]) -> Response<ByteReader> {
         self.socket
             .send(request)
             .expect("Failed to send the request");
@@ -130,11 +125,11 @@ impl Server {
             }
     }
 
-    pub fn get_server_info(&mut self) -> ServerResponse<ServerInfo> {
+    pub fn get_server_info(&mut self) -> Response<ServerInfo> {
         match self.send(&constants::SERVER_INFO_REQUEST) {
-            Response::Failure(reason) => ServerResponse::Failure(format!("Failed to get server infom reason: {}", reason)),
+            Response::Failure(reason) => Response::Failure(format!("Failed to get server infom reason: {}", reason)),
             Response::Ok(mut buf) => {                         
-                ServerResponse::SuccessResponse(
+                Response::Ok(
                     ServerInfo { 
                         header: buf.get_byte(),
                         protocol: buf.get_byte(),
