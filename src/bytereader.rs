@@ -44,7 +44,7 @@ impl ByteReader {
         let byte_size = 4;
         
         self.check_byte_size(byte_size);
-
+        
         let value = f32::from_ne_bytes(
             (&self.response[self.iterator..self.iterator+byte_size])
                 .try_into()
