@@ -9,7 +9,9 @@ pub const SERVER_INFO_REQUEST: [u8; 25] = [
     0x75, 0x65, 0x72, 0x79, 0x00,
 ];
 
-pub const CHALLANGE_RESPONSE: [u8; 9] = [
+pub const CHALLANGE_RESPONSE: u8 = 0x41;
+
+pub const PLAYERS_CHALLANGE_RESPONSE: [u8; 9] = [
     0xFF, 0xFF, 0xFF, 0xFF, 0x55,
     0xFF, 0xFF, 0xFF, 0xFF,
 ];
