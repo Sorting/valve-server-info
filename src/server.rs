@@ -90,11 +90,11 @@ impl ServerVisibility {
 impl Server {
     pub fn connect(ip: &str) -> Self {
         let socket = UdpSocket::bind("0.0.0.0:8899")
-            .expect("Failed to connect to");            
+            .expect(&format!("Failed to connect to {}", ip)[..]);            
         let timout_duration = Duration::from_secs(5);
 
-        socket.set_write_timeout(Some(timout_duration)).expect("");
-        socket.set_read_timeout(Some(timout_duration)).expect("");
+        socket.set_write_timeout(Some(timout_duration)).expect("Failed to set write timeout");
+        socket.set_read_timeout(Some(timout_duration)).expect("Failed to set read timeout");
 
         socket.connect(ip).expect("");
 
@@ -121,7 +121,7 @@ impl Server {
                         Response::Error(format!("Unexpected header received from the server: {:?}", header_response))
                     }                
                 },
-                _ => Response::Error(String::from("Failed to read bytes"))
+                Err(err) => Response::Error(format!("Failed to read bytes, error: {}", err))
             }
     }
 
