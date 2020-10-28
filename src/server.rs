@@ -7,7 +7,7 @@ use std::convert::{TryInto};
 
 pub enum Response<T> {
     Ok(T),
-    Failure(String),
+    Error(String),
 }
 
 pub struct Server {
@@ -118,16 +118,16 @@ impl Server {
                     if header_response == constants::SIMPLE_RESPONSE_HEADER {
                         Response::Ok(ByteReader::new(reader.peek_remaining_bytes().to_vec()))
                     } else {
-                        Response::Failure(format!("Unexpected header received from the server: {:?}", header_response))
+                        Response::Error(format!("Unexpected header received from the server: {:?}", header_response))
                     }                
                 },
-                _ => Response::Failure(String::from("Failed to read bytes"))
+                _ => Response::Error(String::from("Failed to read bytes"))
             }
     }
 
     pub fn get_server_info(&mut self) -> Response<ServerInfo> {
         match self.send(&constants::SERVER_INFO_REQUEST) {
-            Response::Failure(reason) => Response::Failure(format!("Failed to get server infom reason: {}", reason)),
+            Response::Error(reason) => Response::Error(format!("Failed to get server info, reason: {}", reason)),
             Response::Ok(mut buf) => {                         
                 Response::Ok(
                     ServerInfo { 

@@ -14,7 +14,7 @@ fn main() {
     let mut server = Server::bind("178.236.67.44:27015");
     match server
         .get_server_info() {
-            Response::Failure(err) => panic!("{}", err),
+            Response::Error(err) => panic!("{}", err),
             Response::Ok(server_info) => {
                 println!("Server name: {}", server_info.name);
                 println!("Players: {}/{}", server_info.players, server_info.max_players);
