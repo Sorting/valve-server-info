@@ -1,6 +1,3 @@
-use std::collections::{HashMap};
-use crate::server::{ServerType};
-
 pub const SERVER_INFO_REQUEST: [u8; 25] = [
     0xFF, 0xFF, 0xFF, 0xFF, 0x54,
     0x53, 0x6F, 0x75, 0x72, 0x63,

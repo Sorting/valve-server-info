@@ -1,5 +1,5 @@
 use std::str;
-use std::convert::{TryInto};
+use std::convert::TryInto;
 
 pub struct ByteReader {
     response: Vec<u8>,

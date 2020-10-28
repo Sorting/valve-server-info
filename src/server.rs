@@ -1,9 +1,7 @@
 use crate::bytereader::ByteReader;
 use crate::constants;
-use std::io::Result;
 use std::time::Duration;
 use std::net::UdpSocket;
-use std::convert::{TryInto};
 
 pub enum Response<T> {
     Ok(T),
@@ -41,7 +39,6 @@ pub struct ServerInfo {
     pub source_tv_name: Option<String>,
     pub keywords: Option<String>,
     pub game_id: Option<i16>,
-
 }
 
 #[derive(Debug)]
@@ -96,12 +93,12 @@ impl ShipMode {
     pub fn from_byte(byte: u8) -> Self {
         match byte {
             0x00 => Self::Hunt,
-            0x01 =>  Self::Elimination,
+            0x01 => Self::Elimination,
             0x02 => Self::Duel,
             0x03 => Self::Deathmatch,
             0x04 => Self::VipTeam,
             0x05 => Self::TeamElimination,
-            _   => Self::Unknown,
+            _    => Self::Unknown,
         }
     }
 }
@@ -117,10 +114,10 @@ pub enum Environment {
 impl Environment {
     pub fn from_byte(byte: u8) -> Self {
         match byte {
-            0x6C            => Self::Linux,
-            0x77            => Self::Windows,
-            0x6D | 0x6F     => Self::Mac,
-            _               => Self::Unknown,            
+            0x6C        => Self::Linux,
+            0x77        => Self::Windows,
+            0x6D | 0x6F => Self::Mac,
+            _           => Self::Unknown,            
         }
     }
 }
@@ -129,15 +126,15 @@ impl Environment {
 pub enum ServerVisibility {
     Public,
     Private,
-    Unknown
+    Unknown,
 }
 
 impl ServerVisibility {
     pub fn from_byte(byte: u8) -> Self {
         match byte {
-            0x00    => Self::Public,
-            0x01    => Self::Private,
-            _       => Self::Unknown,
+            0x00 => Self::Public,
+            0x01 => Self::Private,
+            _    => Self::Unknown,
         }
     }
 }
@@ -245,7 +242,7 @@ impl Server {
                         let player_count = buf.get_byte();
                         let mut players = vec![];
 
-                        for i in 0..player_count {
+                        for _ in 0..player_count {
                             players.push(Player {
                                 index: buf.get_byte(),
                                 name: buf.get_string(),
