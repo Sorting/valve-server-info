@@ -9,3 +9,10 @@ edition = "2018"
 [dependencies]
 tui = "0.12"
 termion = "1.5"
+rand = "0.7"
+argh = "0.1"
+chrono = "0.4.19"
+
+[dev-dependencies]
+rand = "0.7"
+argh = "0.1"

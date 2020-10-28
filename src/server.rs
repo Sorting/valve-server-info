@@ -1,6 +1,6 @@
 use crate::bytereader::ByteReader;
 use crate::constants;
-use std::time::Duration;
+use chrono::Duration;
 use std::net::UdpSocket;
 
 pub enum Response<T> {
@@ -30,7 +30,7 @@ pub struct ServerInfo {
     pub vac: bool,
     pub ship_mode: Option<ShipMode>,
     pub witnesses: Option<u8>,
-    pub duration: Option<Duration>,
+    pub duration: Option<chrono::Duration>,
     pub version: String,
     pub edf: Option<u8>,
     pub port: Option<i16>,
@@ -43,19 +43,19 @@ pub struct ServerInfo {
 
 #[derive(Debug)]
 pub struct Player {
-    index: u8,
-    name: String,
-    score: u32,
-    duration: Duration,
-    deaths: Option<u32>,
-    money: Option<u32>,
+    pub index: u8,
+    pub name: String,
+    pub score: u32,
+    pub duration: chrono::Duration,
+    pub deaths: u32,
+    pub money: Option<u32>,
 }
 
 #[derive(Debug)]
 pub struct PlayersResponse {
-    header: u8,
-    players: Vec<Player>,
-    is_ship: bool,
+    pub header: u8,
+    pub players: Vec<Player>,
+    pub is_ship: bool,
 }
 
 #[derive(Debug)]
@@ -143,7 +143,9 @@ impl Server {
     pub fn connect(ip: &str) -> Self {
         let socket = UdpSocket::bind("0.0.0.0:8899")
             .expect(&format!("Failed to connect to {}", ip)[..]);            
-        let timout_duration = Duration::from_secs(5);
+        let timout_duration = chrono::Duration::seconds(5)
+            .to_std()
+            .expect("something went wrong");
 
         socket.set_write_timeout(Some(timout_duration)).expect("Failed to set write timeout");
         socket.set_read_timeout(Some(timout_duration)).expect("Failed to set read timeout");
@@ -212,7 +214,7 @@ impl Server {
                     Response::Ok(ServerInfo { 
                         ship_mode: Some(ShipMode::from_byte(buf.get_byte())),
                         witnesses: Some(buf.get_byte()),
-                        duration: Some(Duration::from_secs(buf.get_byte() as u64)),
+                        duration: Some(Duration::seconds(buf.get_byte() as i64)),
                         version: buf.get_string(),
                         .. server_info 
                     })
@@ -246,9 +248,9 @@ impl Server {
                             players.push(Player {
                                 index: buf.get_byte(),
                                 name: buf.get_string(),
-                                score: buf.get_long(),
-                                duration: Duration::from_secs_f32(buf.get_float()),
-                                deaths: None,
+                                score: buf.get_long(),                                
+                                deaths: 0,
+                                duration: Duration::seconds(buf.get_float() as i64),                                
                                 money: None,
                             });
                         }
