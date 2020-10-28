@@ -88,7 +88,7 @@ impl ServerVisibility {
 }
 
 impl Server {
-    pub fn bind(ip: &str) -> Self {
+    pub fn connect(ip: &str) -> Self {
         let socket = UdpSocket::bind("0.0.0.0:8899")
             .expect("Failed to connect to");            
         let timout_duration = Duration::from_secs(5);

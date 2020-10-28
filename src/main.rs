@@ -11,7 +11,7 @@ use tui::widgets::{Widget, Block, Borders};
 use tui::layout::{Layout, Constraint, Direction};
 
 fn main() {
-    let mut server = Server::bind("178.236.67.44:27015");
+    let mut server = Server::connect("178.236.67.44:27015");
     match server.get_server_info() {
         Response::Error(err) => panic!("{}", err),
         Response::Ok(server_info) => {
