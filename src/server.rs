@@ -12,7 +12,7 @@ pub struct Server {
     socket: UdpSocket    
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ServerInfo {
     pub header: u8,
     pub protocol: u8,
@@ -41,7 +41,7 @@ pub struct ServerInfo {
     pub game_id: Option<i16>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Player {
     pub index: u8,
     pub name: String,
@@ -51,14 +51,14 @@ pub struct Player {
     pub money: Option<u32>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayersResponse {
     pub header: u8,
     pub players: Vec<Player>,
     pub is_ship: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum ServerType {
     Dedicated,
     NonDedicated,
@@ -78,7 +78,7 @@ impl ServerType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum ShipMode {
     Hunt,
     Elimination,
@@ -103,7 +103,7 @@ impl ShipMode {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Environment {
     Linux,
     Windows,
@@ -122,7 +122,8 @@ impl Environment {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
+
 pub enum ServerVisibility {
     Public,
     Private,

@@ -6,10 +6,8 @@ mod util;
 
 use crate::util::{
     event::{Event, Events},
-    StatefulList,
 };
 
-use chrono::Duration;
 use crate::server::{Server, Response, ServerInfo, PlayersResponse };
 use std::{error::Error, io};
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
@@ -25,6 +23,7 @@ pub struct StatefulTable {
     server: Server,
     server_info: Option<ServerInfo>,
     players_info: Option<PlayersResponse>,
+    server_name: Option<String>,
     state: TableState,
     items: Vec<Vec<String>>,
 }
@@ -35,20 +34,21 @@ impl StatefulTable {
         StatefulTable {
             players_info: None,
             server_info: None,
-            server: Server::connect("178.236.67.55:27015"),
+            server_name: None,
+            server: Server::connect("178.236.67.8:27015"),
             state: TableState::default(),
             items: vec![],            
         }
     }
 
-    pub fn get_stats(&mut self) -> Result<(ServerInfo, PlayersResponse), ()> {        
+    pub fn get_stats(&mut self) -> Result<(ServerInfo, PlayersResponse), String> {        
         match self.server.get_server_info() {
             Response::Error(err) => {                
-                 Err(())
+                 Err(err)
             },
             Response::Ok(server_info) => {
                 match self.server.get_players() {
-                    Response::Error(err) => Err(()),
+                    Response::Error(err) => Err(err),
                     Response::Ok(player_response) => {
                         Ok((server_info, player_response))
                     }
@@ -68,6 +68,8 @@ impl StatefulTable {
             players_rows.push(vec![player.name.clone(), player.score.to_string(), player.deaths.to_string(), format!("{}h, {:02}m, {:02}s", player.duration.num_hours(), player.duration.num_minutes()-(player.duration.num_hours()*60), player.duration.num_seconds()-(player.duration.num_minutes()*60))]);
         }
         
+        self.server_info = Some(server_info.clone());
+        self.server_name = Some(server_info.name[..].to_string());
         self.items = players_rows;        
     }
 
@@ -116,8 +118,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     setup_panic();
     // Terminal initialization
-    let stdout = io::stdout().into_raw_mode()?;
-    let stdout = MouseTerminal::from(stdout);
+    let stdout = io::stdout().into_raw_mode()?;    
     let stdout = AlternateScreen::from(stdout.into_raw_mode().unwrap());
     let backend = TermionBackend::new(stdout);
     let mut terminal = Terminal::new(backend).unwrap();
@@ -137,16 +138,25 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .split(f.size());
 
             let selected_style = Style::default()
-                .fg(Color::Yellow)
-                .add_modifier(Modifier::BOLD);
-            let normal_style = Style::default().fg(Color::White);
+                .fg(Color::Blue);
+                
+            let normal_style = Style::default()
+                .fg(Color::White);
+
             let header = ["Name", "Frags", "Deaths", "Duration"];
+            
             let rows = table
                 .items
                 .iter()
                 .map(|i| Row::StyledData(i.iter(), normal_style));
+            
+            let server_name = match &table.server_info {
+                Some(server_info) => format!("{} | Map: {} | Players: {}/{}", &server_info.name, &server_info.map, &server_info.players, &server_info.max_players),
+                _ => "Nothing to see here".to_string()
+            };
+                
             let t = Table::new(header.iter(), rows)
-                .block(Block::default().borders(Borders::ALL).title("Player stats"))
+                .block(Block::default().borders(Borders::ALL).title(server_name))
                 .highlight_style(selected_style)
                 .highlight_symbol(">> ")
                 .widths(&[
@@ -155,6 +165,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                     Constraint::Length(30),
                     Constraint::Max(15),
                 ]);
+
+            // let t = Table::new(["label", "value"], rows: R)
             f.render_stateful_widget(t, rects[0], &mut table.state);
         }).expect("something went wrong");
 
