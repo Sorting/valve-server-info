@@ -148,8 +148,13 @@ impl Server {
             .to_std()
             .expect("something went wrong");
 
-        socket.set_write_timeout(Some(timout_duration)).expect("Failed to set write timeout");
-        socket.set_read_timeout(Some(timout_duration)).expect("Failed to set read timeout");
+        socket
+            .set_write_timeout(Some(timout_duration))
+            .expect("Failed to set write timeout");
+        
+        socket
+            .set_read_timeout(Some(timout_duration))
+            .expect("Failed to set read timeout");
 
         socket.connect(ip).expect("");
 

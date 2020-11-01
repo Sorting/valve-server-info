@@ -47,7 +47,7 @@ impl ByteReader {
         
         self.check_byte_size(byte_size);
         
-        let value = f32::from_ne_bytes(
+        let value = f32::from_le_bytes(
             (&self.response[self.iterator..self.iterator+byte_size])
                 .try_into()
                 .expect("Slice with incorrect length")
@@ -63,7 +63,7 @@ impl ByteReader {
         
         self.check_byte_size(byte_size);
         
-        let value = i16::from_ne_bytes(
+        let value = i16::from_le_bytes(
             (&self.response[self.iterator..self.iterator+byte_size])
                 .try_into()
                 .expect("Slice with incorrect length")
@@ -74,12 +74,13 @@ impl ByteReader {
         value
     }
 
+    #[ignore = "unused_attributes"]
     pub fn get_int(&mut self) -> i32 {
         let byte_size = 4;
         
         self.check_byte_size(byte_size);
         
-        let value = i32::from_ne_bytes(
+        let value = i32::from_le_bytes(
             (&self.response[self.iterator..self.iterator+byte_size])
                 .try_into()
                 .expect("Slice with incorrect length")
@@ -95,7 +96,7 @@ impl ByteReader {
         
         self.check_byte_size(byte_size);
         
-        let value = u32::from_ne_bytes(
+        let value = u32::from_le_bytes(
             (&self.response[self.iterator..self.iterator+byte_size])
                 .try_into()
                 .expect("Slice with incorrect length")
@@ -200,7 +201,7 @@ mod tests {
 
     #[test]
     fn test_get_short() {
-        let data = [i16::to_ne_bytes(6230), i16::to_ne_bytes(1234)].concat();
+        let data = [i16::to_le_bytes(6230), i16::to_le_bytes(1234)].concat();
         
         data.iter().for_each(|b| println!("{}", b));
 
@@ -212,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_get_int() {
-        let data = i32::to_ne_bytes(655556).to_vec();
+        let data = i32::to_le_bytes(655556).to_vec();
 
         let mut reader = ByteReader::new(data);
 
@@ -221,7 +222,7 @@ mod tests {
 
     #[test]
     fn test_get_long() {
-        let data = u64::to_ne_bytes(655556000).to_vec();
+        let data = u64::to_le_bytes(655556000).to_vec();
 
         let mut reader = ByteReader::new(data);
 
@@ -230,7 +231,7 @@ mod tests {
 
     #[test]
     fn test_get_float() {
-        let data = f32::to_ne_bytes(132.34).to_vec();
+        let data = f32::to_le_bytes(132.34).to_vec();
 
         data.iter().for_each(|x| println!("{}", x));
         
