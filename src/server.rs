@@ -256,6 +256,8 @@ impl Server {
                             });
                         }
 
+                        players.sort_by(|a, b| b.score.cmp(&a.score));
+
                         Response::Ok(PlayersResponse {
                             header,
                             is_ship: false,

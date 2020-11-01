@@ -19,11 +19,10 @@ use tui::{
     Terminal,
 };
 
-pub struct StatefulTable {
+pub struct StatefulTable{
     server: Server,
     server_info: Option<ServerInfo>,
     players_info: Option<PlayersResponse>,
-    server_name: Option<String>,
     state: TableState,
     items: Vec<Vec<String>>,
 }
@@ -34,7 +33,6 @@ impl StatefulTable {
         StatefulTable {
             players_info: None,
             server_info: None,
-            server_name: None,
             server: Server::connect("178.236.67.8:27015"),
             state: TableState::default(),
             items: vec![],            
@@ -58,18 +56,24 @@ impl StatefulTable {
     }
 
     pub fn update(&mut self) {
-        let (server_info, players_info) = &mut (self.get_stats()).unwrap();
+        let (server_info, players_info) = (self.get_stats()).unwrap();
         
-        let mut players_rows = vec![];        
-        
-        players_info.players.sort_by(|a, b| b.score.cmp(&a.score));
+        let mut players_rows = vec![];
 
         for player in players_info.players.iter() {
-            players_rows.push(vec![player.name.clone(), player.score.to_string(), player.deaths.to_string(), format!("{}h, {:02}m, {:02}s", player.duration.num_hours(), player.duration.num_minutes()-(player.duration.num_hours()*60), player.duration.num_seconds()-(player.duration.num_minutes()*60))]);
+            players_rows.push(
+                vec![
+                    player.name.clone(),
+                    player.score.to_string(), 
+                    format!("{}h, {:02}m, {:02}s", 
+                        player.duration.num_hours(), 
+                        player.duration.num_minutes()-(player.duration.num_hours()*60), 
+                        player.duration.num_seconds()-(player.duration.num_minutes()*60))
+                ]
+        );
         }
         
-        self.server_info = Some(server_info.clone());
-        self.server_name = Some(server_info.name[..].to_string());
+        self.server_info = Some(server_info);
         self.items = players_rows;        
     }
 
@@ -143,7 +147,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let normal_style = Style::default()
                 .fg(Color::White);
 
-            let header = ["Name", "Frags", "Deaths", "Duration"];
+            let header = ["Name", "Score", "Duration"];
             
             let rows = table
                 .items
@@ -161,7 +165,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                 .highlight_symbol(">> ")
                 .widths(&[
                     Constraint::Percentage(50),
-                    Constraint::Length(30),
                     Constraint::Length(30),
                     Constraint::Max(15),
                 ]);
